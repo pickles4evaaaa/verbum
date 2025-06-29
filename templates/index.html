@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verbum - Thesaurus</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #4a5568;
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+
+        .tagline {
+            color: #718096;
+            font-size: 1.1rem;
+            margin-bottom: 40px;
+            font-weight: 400;
+        }
+
+        .search-container {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 18px 24px;
+            font-size: 1.2rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 50px;
+            outline: none;
+            transition: all 0.3s ease;
+            background: #fff;
+        }
+
+        .search-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-button {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 50px;
+            padding: 12px 24px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .search-button:hover {
+            transform: translateY(-50%) scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .search-button:active {
+            transform: translateY(-50%) scale(0.98);
+        }
+
+        .loading {
+            display: none;
+            margin: 20px 0;
+        }
+
+        .spinner {
+            border: 3px solid #e2e8f0;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .results {
+            margin-top: 30px;
+            text-align: left;
+        }
+
+        .word-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 20px;
+            text-align: center;
+            text-transform: capitalize;
+        }
+
+        .synonyms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .synonym-tag {
+            background: linear-gradient(135deg, #f7fafc, #edf2f7);
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px 16px;
+            text-align: center;
+            font-weight: 500;
+            color: #4a5568;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .synonym-tag:hover {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .count {
+            text-align: center;
+            color: #718096;
+            font-size: 0.9rem;
+            margin-top: 20px;
+        }
+
+        .error {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 16px;
+            border-radius: 12px;
+            margin-top: 20px;
+            border: 1px solid #feb2b2;
+        }
+
+        .no-results {
+            text-align: center;
+            color: #718096;
+            font-style: italic;
+            margin-top: 20px;
+            padding: 20px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+                margin: 10px;
+            }
+            
+            .logo {
+                font-size: 2.5rem;
+            }
+            
+            .search-input {
+                font-size: 1rem;
+                padding: 16px 20px;
+            }
+            
+            .synonyms-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">Verbum</div>
+        <div class="tagline">Discover the perfect word</div>
+        
+        <div class="search-container">
+            <input 
+                type="text" 
+                class="search-input" 
+                placeholder="Enter a word to find synonyms..."
+                id="wordInput"
+                autocomplete="off"
+                spellcheck="false"
+            >
+            <button class="search-button" onclick="searchSynonyms()">Search</button>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+        </div>
+        
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const wordInput = document.getElementById('wordInput');
+        const loading = document.getElementById('loading');
+        const results = document.getElementById('results');
+
+        // Search on Enter key
+        wordInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchSynonyms();
+            }
+        });
+
+        // Auto-focus the input
+        wordInput.focus();
+
+        async function searchSynonyms() {
+            const word = wordInput.value.trim();
+            
+            if (!word) {
+                showError('Please enter a word');
+                return;
+            }
+
+            // Validate input on client side as well
+            if (!/^[a-zA-Z\-']+$/.test(word)) {
+                showError('Please enter a valid word (letters, hyphens, and apostrophes only)');
+                return;
+            }
+
+            if (word.length > 50) {
+                showError('Word is too long (maximum 50 characters)');
+                return;
+            }
+
+            showLoading();
+            clearResults();
+
+            try {
+                const response = await fetch('/api/synonyms', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ word: word })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to fetch synonyms');
+                }
+
+                showResults(data);
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function showLoading() {
+            loading.style.display = 'block';
+        }
+
+        function hideLoading() {
+            loading.style.display = 'none';
+        }
+
+        function clearResults() {
+            results.innerHTML = '';
+        }
+
+        function showResults(data) {
+            if (data.synonyms.length === 0) {
+                results.innerHTML = `
+                    <div class="no-results">
+                        No synonyms found for "${data.word}". Try a different word.
+                    </div>
+                `;
+                return;
+            }
+
+            const synonymsHTML = data.synonyms.map(synonym => 
+                `<div class="synonym-tag" onclick="searchWord('${synonym}')">${synonym}</div>`
+            ).join('');
+
+            results.innerHTML = `
+                <div class="word-title">${data.word}</div>
+                <div class="synonyms-grid">
+                    ${synonymsHTML}
+                </div>
+                <div class="count">${data.count} synonym${data.count !== 1 ? 's' : ''} found</div>
+            `;
+        }
+
+        function showError(message) {
+            results.innerHTML = `<div class="error">${message}</div>`;
+        }
+
+        function searchWord(word) {
+            wordInput.value = word;
+            searchSynonyms();
+        }
+
+        // Prevent any potential XSS by escaping HTML
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+    </script>
+</body>
+</html>
