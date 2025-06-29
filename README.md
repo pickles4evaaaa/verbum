@@ -10,7 +10,8 @@ A sleek, minimalist thesaurus application powered by WordNet that provides synon
 
 - **🎨 Clean Interface**: Minimalist design focused on functionality
 - **📚 WordNet Integration**: Uses the comprehensive WordNet lexical database
-- **🔒 Security First**: Input validation and sanitization to prevent vulnerabilities
+- **� Word Definitions**: Shows clear definitions along with synonyms
+- **�🔒 Security First**: Input validation and sanitization to prevent vulnerabilities
 - **📱 Responsive Design**: Works beautifully on desktop and mobile
 - **🏠 Self-Hosted**: Run it on your own server with complete control
 - **⚡ Fast & Lightweight**: Quick synonym lookups with minimal resource usage
@@ -26,8 +27,9 @@ A sleek, minimalist thesaurus application powered by WordNet that provides synon
 
 ## 🚀 Quick Start
 
-1. **Clone and Navigate**
+1. **Clone the Repository**
    ```bash
+   git clone https://github.com/pickles4evaaaa/verbum.git
    cd verbum
    ```
 
@@ -59,6 +61,10 @@ A sleek, minimalist thesaurus application powered by WordNet that provides synon
 For containerized deployment:
 
 ```bash
+# Clone the repository first
+git clone https://github.com/pickles4evaaaa/verbum.git
+cd verbum
+
 # Build and run with Docker Compose
 docker-compose up --build
 
@@ -103,6 +109,7 @@ The app provides a simple REST API:
 ```json
 {
   "word": "example",
+  "definition": "an item of information that is typical of a class or group",
   "synonyms": ["instance", "case", "illustration", "sample"],
   "count": 4
 }
@@ -159,11 +166,13 @@ Try searching for these words to see Verbum in action:
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run tests: `python test.py`
-5. Submit a pull request
+1. Fork the repository from https://github.com/pickles4evaaaa/verbum
+2. Clone your fork: `git clone https://github.com/YOUR-USERNAME/verbum.git`
+3. Create a feature branch: `git checkout -b feature-name`
+4. Make your changes
+5. Run tests: `python test.py`
+6. Commit and push: `git commit -m "Add feature" && git push origin feature-name`
+7. Submit a pull request
 
 ## 📄 License
 

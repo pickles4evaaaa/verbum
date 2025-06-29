@@ -43,14 +43,19 @@ def sanitize_input(word):
 
 def get_synonyms(word):
     """
-    Get synonyms for a given word using WordNet.
-    Returns a list of unique synonyms.
+    Get synonyms and definition for a given word using WordNet.
+    Returns a dictionary with synonyms list and definition.
     """
     synonyms = set()
+    definition = ""
     
     try:
         # Get all synsets (synonym sets) for the word
         synsets = wordnet.synsets(word)
+        
+        if synsets:
+            # Get the definition from the first synset (most common meaning)
+            definition = synsets[0].definition()
         
         for syn in synsets:
             # Get all lemmas (word forms) for each synset
@@ -62,10 +67,13 @@ def get_synonyms(word):
     
     except Exception as e:
         logger.error(f"Error getting synonyms for '{word}': {e}")
-        return []
+        return {"synonyms": [], "definition": ""}
     
     # Convert to sorted list for consistent output
-    return sorted(list(synonyms))
+    return {
+        "synonyms": sorted(list(synonyms)),
+        "definition": definition
+    }
 
 @app.route('/')
 def index():
@@ -87,12 +95,13 @@ def api_synonyms():
         if not word:
             return jsonify({'error': 'Invalid word format'}), 400
         
-        synonyms = get_synonyms(word)
+        result = get_synonyms(word)
         
         return jsonify({
             'word': word,
-            'synonyms': synonyms,
-            'count': len(synonyms)
+            'synonyms': result['synonyms'],
+            'definition': result['definition'],
+            'count': len(result['synonyms'])
         })
     
     except Exception as e:

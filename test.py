@@ -36,20 +36,25 @@ def test_synonyms():
     print("🧪 Testing synonym lookup...")
     
     # Test with common words
-    synonyms = get_synonyms("happy")
-    assert isinstance(synonyms, list)
-    assert len(synonyms) > 0
-    print(f"Found {len(synonyms)} synonyms for 'happy': {synonyms[:5]}...")
+    result = get_synonyms("happy")
+    assert isinstance(result, dict)
+    assert 'synonyms' in result
+    assert 'definition' in result
+    assert isinstance(result['synonyms'], list)
+    assert len(result['synonyms']) > 0
+    assert isinstance(result['definition'], str)
+    print(f"Found {len(result['synonyms'])} synonyms for 'happy': {result['synonyms'][:5]}...")
+    print(f"Definition: {result['definition'][:50]}..." if result['definition'] else "No definition found")
     
-    synonyms = get_synonyms("big")
-    assert isinstance(synonyms, list)
-    assert len(synonyms) > 0
-    print(f"Found {len(synonyms)} synonyms for 'big': {synonyms[:5]}...")
+    result = get_synonyms("big")
+    assert isinstance(result, dict)
+    assert len(result['synonyms']) > 0
+    print(f"Found {len(result['synonyms'])} synonyms for 'big': {result['synonyms'][:5]}...")
     
     # Test with non-existent word
-    synonyms = get_synonyms("xyzabc123notaword")
-    assert isinstance(synonyms, list)
-    assert len(synonyms) == 0
+    result = get_synonyms("xyzabc123notaword")
+    assert isinstance(result, dict)
+    assert len(result['synonyms']) == 0
     
     print("✓ Synonym lookup tests passed!")
 
