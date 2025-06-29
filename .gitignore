@@ -34,12 +34,15 @@ ENV/
 env.bak/
 venv.bak/
 
-# NLTK data (will be downloaded automatically)
-nltk_data/
+# NLTK data (bundled for self-hosting - should be committed)
+# nltk_data/
 
 # Search history data
 search_history.json
 data/
+
+# Verification scripts (optional - for development)
+verify_self_hosted.py
 
 # IDE
 .vscode/

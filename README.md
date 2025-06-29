@@ -36,6 +36,16 @@ A beautiful, minimalist thesaurus application powered by WordNet that provides i
 
 ## 🚀 Quick Start
 
+### 🐳 Fastest: Docker Hub Image (Recommended)
+
+```bash
+# Create persistent storage and run Verbum instantly
+docker volume create verbum_data
+docker run -d --name verbum -p 5020:5020 -v verbum_data:/app/data pickles4evaaaa/verbum:latest
+
+# Open http://localhost:5020 in your browser
+```
+
 ### Method 1: Local Installation
 
 ```bash
@@ -46,8 +56,8 @@ cd verbum
 # 2. Install Python dependencies
 pip install -r requirements.txt
 
-# 3. Setup WordNet data (one-time setup)
-python setup.py
+# 3. Run the application (WordNet data is bundled - no setup needed!)
+python app.py
 
 # 4. Run tests to verify installation
 python test.py
@@ -58,7 +68,34 @@ python app.py
 # 6. Access the app at http://localhost:5020
 ```
 
-### Method 2: Docker Deployment
+### Method 2: Docker Deployment (Recommended)
+
+#### Option A: Using Pre-built Docker Hub Image (Fastest)
+
+```bash
+# Create persistent volume for search history
+docker volume create verbum_data
+
+# Run with profanity filter enabled (recommended for public use)
+docker run -d \
+  --name verbum \
+  -p 5020:5020 \
+  -v verbum_data:/app/data \
+  -e ENABLE_PROFANITY_FILTER=true \
+  pickles4evaaaa/verbum:latest
+
+# Or run with profanity filter disabled (for academic/research use)
+docker run -d \
+  --name verbum \
+  -p 5020:5020 \
+  -v verbum_data:/app/data \
+  -e ENABLE_PROFANITY_FILTER=false \
+  pickles4evaaaa/verbum:latest
+
+# Access the app at http://localhost:5020
+```
+
+#### Option B: Building from Source
 
 ```bash
 # Quick start with Docker Compose (profanity filter enabled by default)

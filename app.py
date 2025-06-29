@@ -13,6 +13,17 @@ from better_profanity import profanity
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Configure NLTK to use bundled data - ensure self-hosting
+NLTK_DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'nltk_data')
+if os.path.exists(NLTK_DATA_DIR):
+    nltk.data.path.insert(0, NLTK_DATA_DIR)
+    logger.info(f"Using bundled WordNet data from: {NLTK_DATA_DIR}")
+else:
+    # For true self-hosting, we should not download - data must be bundled
+    logger.error(f"Bundled WordNet data not found at: {NLTK_DATA_DIR}")
+    logger.error("This application requires bundled WordNet data for self-hosting.")
+    raise FileNotFoundError("WordNet data not found. Ensure nltk_data/ directory is present.")
+
 app = Flask(__name__)
 
 # Initialize profanity filter based on environment setting
@@ -60,13 +71,14 @@ def save_search_history(words, last_cleanup):
 # Initialize search history
 search_history, last_cleanup = load_search_history()
 
-# Download WordNet data if not already present
+# Verify WordNet data is available (must be bundled for self-hosting)
 try:
     nltk.data.find('corpora/wordnet')
+    logger.info("WordNet corpus ready")
 except LookupError:
-    logger.info("Downloading WordNet corpus...")
-    nltk.download('wordnet', quiet=True)
-    nltk.download('omw-1.4', quiet=True)
+    logger.error("WordNet corpus not found in bundled data")
+    logger.error("This application requires bundled WordNet data for true self-hosting.")
+    raise FileNotFoundError("WordNet corpus not accessible. Check nltk_data/corpora/wordnet/ exists.")
 
 def sanitize_input(word):
     """

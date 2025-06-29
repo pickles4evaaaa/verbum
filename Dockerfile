@@ -14,11 +14,10 @@ COPY requirements.txt .
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application files
+# Copy application files (including bundled WordNet data)
 COPY . .
 
-# Run setup to download NLTK data
-RUN python setup.py
+# No need to run setup.py anymore - WordNet data is bundled
 
 # Create data directory for persistent storage
 RUN mkdir -p /app/data
