@@ -20,6 +20,39 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .wordcloud-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.1;
+            overflow: hidden;
+        }
+
+        .wordcloud-word {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 600;
+            pointer-events: none;
+            user-select: none;
+            transform-origin: center;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateX(-100px) rotate(0deg);
+            }
+            100% {
+                transform: translateX(calc(100vw + 100px)) rotate(360deg);
+            }
         }
 
         .container {
@@ -31,6 +64,8 @@
             width: 100%;
             max-width: 600px;
             text-align: center;
+            position: relative;
+            z-index: 10;
         }
 
         .logo {
@@ -246,6 +281,9 @@
     </style>
 </head>
 <body>
+    <!-- Word Cloud Background -->
+    <div class="wordcloud-background" id="wordcloudBackground"></div>
+    
     <div class="container">
         <div class="logo">Verbum</div>
         <div class="tagline">Discover the perfect word</div>
@@ -282,6 +320,7 @@
         const loading = document.getElementById('loading');
         const results = document.getElementById('results');
         const githubLink = document.getElementById('githubLink');
+        const wordcloudBackground = document.getElementById('wordcloudBackground');
 
         // Search on Enter key
         wordInput.addEventListener('keypress', function(e) {
@@ -292,6 +331,77 @@
 
         // Auto-focus the input
         wordInput.focus();
+
+        // Initialize word cloud
+        loadWordCloud();
+        
+        // Update word cloud every 30 seconds
+        setInterval(loadWordCloud, 30000);
+
+        async function loadWordCloud() {
+            try {
+                console.log('Loading word cloud...');
+                const response = await fetch('/api/wordcloud');
+                const data = await response.json();
+                console.log('Word cloud data:', data);
+                
+                if (response.ok && data.words && data.words.length > 0) {
+                    console.log('Updating word cloud with', data.words.length, 'words');
+                    updateWordCloud(data.words);
+                } else {
+                    console.log('No words available for word cloud');
+                }
+            } catch (error) {
+                console.log('Word cloud error:', error);
+            }
+        }
+
+        function updateWordCloud(words) {
+            console.log('Updating word cloud background with words:', words);
+            // Clear existing words
+            wordcloudBackground.innerHTML = '';
+            
+            // Add new words
+            words.forEach((wordData, index) => {
+                setTimeout(() => {
+                    console.log('Creating floating word:', wordData.text);
+                    createFloatingWord(wordData.text, wordData.weight);
+                }, index * 2000); // Stagger the appearance
+            });
+        }
+
+        function createFloatingWord(word, weight) {
+            console.log('Creating floating word element for:', word, 'weight:', weight);
+            const wordElement = document.createElement('div');
+            wordElement.className = 'wordcloud-word';
+            wordElement.textContent = word;
+            
+            // Size based on weight (min 16px, max 48px)
+            const fontSize = Math.min(48, Math.max(16, 16 + (weight * 3)));
+            wordElement.style.fontSize = fontSize + 'px';
+            
+            // Random vertical position
+            const randomY = Math.random() * (window.innerHeight - 60);
+            wordElement.style.top = randomY + 'px';
+            
+            // Random animation duration (15-25 seconds)
+            const duration = 15 + Math.random() * 10;
+            wordElement.style.animationDuration = duration + 's';
+            
+            // Random delay
+            const delay = Math.random() * 5;
+            wordElement.style.animationDelay = delay + 's';
+            
+            console.log('Appending word element to background');
+            wordcloudBackground.appendChild(wordElement);
+            
+            // Remove element after animation completes
+            setTimeout(() => {
+                if (wordElement.parentNode) {
+                    wordElement.parentNode.removeChild(wordElement);
+                }
+            }, (duration + delay + 1) * 1000);
+        }
 
         function moveGithubLinkToBottom() {
             // Move GitHub link to bottom of container after results
@@ -338,6 +448,9 @@
 
                 showResults(data);
                 moveGithubLinkToBottom(); // Move GitHub link after results are shown
+                
+                // Update word cloud after a successful search
+                setTimeout(loadWordCloud, 1000);
             } catch (error) {
                 showError(error.message);
                 moveGithubLinkToBottom(); // Move GitHub link after error is shown

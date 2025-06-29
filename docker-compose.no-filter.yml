@@ -12,8 +12,8 @@ services:
       - PORT=5020
       # Data persistence
       - SEARCH_HISTORY_DIR=/app/data
-      # Content filtering (set to false to disable profanity filter)
-      - ENABLE_PROFANITY_FILTER=true
+      # Content filtering disabled for academic/research use
+      - ENABLE_PROFANITY_FILTER=false
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5020/"]

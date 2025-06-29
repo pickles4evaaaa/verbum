@@ -20,6 +20,9 @@ COPY . .
 # Run setup to download NLTK data
 RUN python setup.py
 
+# Create data directory for persistent storage
+RUN mkdir -p /app/data
+
 # Create non-root user for security
 RUN useradd --create-home --shell /bin/bash app && chown -R app:app /app
 USER app

@@ -37,6 +37,10 @@ venv.bak/
 # NLTK data (will be downloaded automatically)
 nltk_data/
 
+# Search history data
+search_history.json
+data/
+
 # IDE
 .vscode/
 .idea/

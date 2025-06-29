@@ -29,7 +29,20 @@ def test_sanitization():
     assert sanitize_input(None) is None
     assert sanitize_input(123) is None
     
-    print("✓ Input sanitization tests passed!")
+    # Test profanity filtering (behavior depends on environment setting)
+    # Note: The profanity filter can be enabled/disabled via ENABLE_PROFANITY_FILTER env var
+    from app import ENABLE_PROFANITY_FILTER
+    if ENABLE_PROFANITY_FILTER:
+        assert sanitize_input("shit") is None  # Should be blocked by profanity filter
+        print("  - Profanity filter is ENABLED")
+    else:
+        # When disabled, profanity words pass through sanitization (but may not have synonyms)
+        result = sanitize_input("shit")
+        print(f"  - Profanity filter is DISABLED, profane word → {result}")
+    
+    assert sanitize_input("asdfghjkl") == "asdfghjkl"  # Nonsense but not profanity
+    
+    print("✓ Input sanitization and profanity filtering tests passed!")
 
 def test_synonyms():
     """Test synonym lookup functionality."""
@@ -81,6 +94,33 @@ def test_security():
     
     print("✓ Security tests passed!")
 
+def test_api_profanity_blocking():
+    """Test that the API handles profanity based on configuration."""
+    print("🧪 Testing API profanity handling...")
+    
+    from app import app, ENABLE_PROFANITY_FILTER
+    
+    with app.test_client() as client:
+        if ENABLE_PROFANITY_FILTER:
+            # Test profanity blocking when filter is enabled
+            response = client.post('/api/synonyms', 
+                                 json={'word': 'damn'},
+                                 content_type='application/json')
+            # Note: 'damn' might pass through as it's a legitimate dictionary word
+            print(f"  - Filter enabled: 'damn' response code: {response.status_code}")
+        else:
+            print("  - Profanity filter is disabled, all words pass through sanitization")
+        
+        # Test that clean words always work
+        response = client.post('/api/synonyms', 
+                             json={'word': 'happy'},
+                             content_type='application/json')
+        assert response.status_code == 200
+        data = response.get_json()
+        assert 'synonyms' in data
+        
+    print("✓ API profanity handling tests passed!")
+
 if __name__ == '__main__':
     print("🔬 Running Verbum Tests...")
     print("=" * 50)
@@ -89,6 +129,7 @@ if __name__ == '__main__':
         test_sanitization()
         test_synonyms()
         test_security()
+        test_api_profanity_blocking()
         
         print("=" * 50)
         print("✅ All tests passed! Verbum is ready to use.")

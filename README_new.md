@@ -61,21 +61,15 @@ python app.py
 ### Method 2: Docker Deployment
 
 ```bash
-# Quick start with Docker Compose (profanity filter enabled by default)
+# Quick start with Docker Compose
 git clone https://github.com/pickles4evaaaa/verbum.git
 cd verbum
 docker-compose up --build
 
-# For academic/research use with no content filtering
-docker-compose -f docker-compose.no-filter.yml up --build
-
-# Or with Docker directly (with persistent storage)
+# Or with Docker directly
 docker build -t verbum .
-docker volume create verbum_data
-docker run -p 5020:5020 -v verbum_data:/app/data -e ENABLE_PROFANITY_FILTER=true verbum
+docker run -p 5020:5020 verbum
 ```
-
-**🔄 Data Persistence**: Docker deployments automatically create a `verbum_data` volume to persist your search history and word cloud across container restarts and updates.
 
 ## ⚙️ Configuration
 
@@ -87,7 +81,6 @@ docker run -p 5020:5020 -v verbum_data:/app/data -e ENABLE_PROFANITY_FILTER=true
 | `HOST` | `127.0.0.1` | Host to bind to (use `0.0.0.0` for Docker) |
 | `ENABLE_PROFANITY_FILTER` | `true` | Enable/disable content filtering |
 | `MAX_WORD_LENGTH` | `50` | Maximum allowed word length |
-| `SEARCH_HISTORY_DIR` | `./data` | Directory for persistent search history storage |
 
 ### Content Filtering
 
@@ -103,21 +96,6 @@ ENABLE_PROFANITY_FILTER=false python app.py
 
 **When enabled**: Blocks inappropriate language from being processed or saved
 **When disabled**: All words pass through sanitization, but only dictionary words with synonyms get saved to word cloud
-
-### Data Persistence
-
-Search history and word cloud data are automatically persisted:
-
-- **Local deployment**: Saves to `./data/search_history.json` by default
-- **Docker deployment**: Uses Docker volumes for persistence across container restarts
-- **Custom location**: Set `SEARCH_HISTORY_DIR` environment variable
-
-```bash
-# Custom data directory
-SEARCH_HISTORY_DIR=/path/to/data python app.py
-```
-
-**Docker persistence**: The `verbum_data` volume ensures your word cloud and search history survive container updates and restarts.
 
 ### Production Configuration
 
@@ -232,8 +210,7 @@ verbum/
 ├── 🔧 demo_profanity_toggle.py # Demo script for content filtering
 ├── 📊 search_history.json      # Word search persistence (auto-generated)
 ├── 🐳 Dockerfile               # Container configuration
-├── 🐙 docker-compose.yml       # Docker setup with profanity filter enabled
-├── 🔓 docker-compose.no-filter.yml # Docker setup with profanity filter disabled
+├── 🐙 docker-compose.yml       # Multi-container orchestration
 ├── 🔑 .env.example             # Environment variables template
 ├── 🚫 .gitignore               # Git ignore patterns
 └── 📖 README.md                # This documentation
@@ -285,15 +262,12 @@ print(f"Total searches: {cloud_data['total_searches']}")
 git clone https://github.com/pickles4evaaaa/verbum.git
 cd verbum
 
-# Configure environment (optional)
+# Configure environment
 cp .env.example .env
 # Edit .env for your environment
 
-# Deploy with Docker Compose (profanity filter enabled)
-docker-compose up -d --build
-
-# Or deploy without content filtering for academic use
-docker-compose -f docker-compose.no-filter.yml up -d --build
+# Deploy with Docker Compose
+docker-compose -f docker-compose.yml up -d --build
 ```
 
 ### Method 2: Direct Deployment
@@ -448,6 +422,11 @@ copies or substantial portions of the Software.
 - **[NLTK](https://www.nltk.org/)** - Natural Language Toolkit for Python
 - **[Flask](https://flask.palletsprojects.com/)** - Lightweight Python web framework
 - **[better-profanity](https://github.com/snguyenthanh/better_profanity)** - Content filtering library
+
+### Inspiration
+- **Modern Web Design** - Clean, minimalist interfaces
+- **Academic Research Tools** - Scholarly word analysis applications
+- **Developer Experience** - Tools that prioritize security and ease of use
 
 ---
 
