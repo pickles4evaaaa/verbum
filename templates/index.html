@@ -74,6 +74,13 @@
             color: #4a5568;
             margin-bottom: 10px;
             letter-spacing: -1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logo:hover {
+            color: #667eea;
+            transform: scale(1.02);
         }
 
         .tagline {
@@ -285,7 +292,7 @@
     <div class="wordcloud-background" id="wordcloudBackground"></div>
     
     <div class="container">
-        <div class="logo">Verbum</div>
+        <div class="logo" onclick="resetToHome()" title="Click to return to home">Verbum</div>
         <div class="tagline">Discover the perfect word</div>
         
         <div class="search-container">
@@ -449,6 +456,9 @@
                 showResults(data);
                 moveGithubLinkToBottom(); // Move GitHub link after results are shown
                 
+                // Clear the search input for easier next search
+                wordInput.value = '';
+                
                 // Update word cloud after a successful search
                 setTimeout(loadWordCloud, 1000);
             } catch (error) {
@@ -505,6 +515,25 @@
         function searchWord(word) {
             wordInput.value = word;
             searchSynonyms();
+        }
+
+        function resetToHome() {
+            // Clear search input
+            wordInput.value = '';
+            
+            // Clear results
+            clearResults();
+            
+            // Hide loading
+            hideLoading();
+            
+            // Move GitHub link back to original position
+            const container = document.querySelector('.container');
+            const resultsDiv = document.getElementById('results');
+            container.insertBefore(githubLink, resultsDiv);
+            
+            // Focus on search input
+            wordInput.focus();
         }
 
         // Prevent any potential XSS by escaping HTML
